@@ -1,6 +1,7 @@
 const assign = require('object-assign');
 const toSvg = require('./glyphToSvgPath');
 const transformSVGPath = require('./transformSvgPath');
+const defaults = require('lodash.defaults');
 
 function svgPathsToShape (path, opts, THREE) {
   opts = assign({
@@ -10,22 +11,17 @@ function svgPathsToShape (path, opts, THREE) {
     simplify: 0,
     scale: 1
   }, opts);
-/*  
-let bevelThickness = options.bevelThickness !== undefined ? options.bevelThickness : 6; // 10
-let bevelSize = options.bevelSize !== undefined ? options.bevelSize : bevelThickness - 2; // 8
-let bevelSegments = options.bevelSegments !== undefined ? options.bevelSegments : 3;
-let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : true; // false
-*/
-  let extrudeSettings = {
-      amount          : 20,
-      steps           : 1,
-      material        : 1,
-      extrudeMaterial : 0,
-      bevelEnabled    : true,
-      bevelThickness  : 2,
-      bevelSize       : 4,
-      bevelSegments   : 1,
-  };
+
+  let extrudeSettings = defaults(opts.extrude, {
+    amount          : 20,
+    steps           : 1,
+    material        : 1,
+    extrudeMaterial : 0,
+    bevelEnabled    : true,
+    bevelThickness  : 2,
+    bevelSize       : 4,
+    bevelSegments   : 1,
+  });
 
   let geo = new THREE.Geometry();
   let svgPaths = toSvg(path);

@@ -5,6 +5,16 @@ const defaults = require('lodash.defaults');
 const xtend = require('xtend');
 const THREE = require('three');
 
+DEFAULT_OPTS = {
+  fontSizePx: 72,
+  lineHeight: 1,
+  width: 600,
+  letterSpacing: 0,
+  currentText: undefined,
+  extrude: undefined,
+  callback: noop
+}
+
 function noop() {}
 
 function OpenTypeGeometry(opts) {
@@ -34,21 +44,7 @@ OpenTypeGeometry.prototype.setText = function(text) {
 
 OpenTypeGeometry.prototype.updateLayout = function(opts) {
   let _this = this;
-  defaults(opts, {
-    fontSizePx: 72,
-    lineHeight: 2,
-    width: 600,
-    letterSpacing: 1.175,
-    extrude: {
-      amount: 1000,
-      steps: 1000,
-      bevelEnabled    : true,
-      bevelThickness  : 100,
-      bevelSize       : 100,
-      bevelSegments   : 4
-    },
-    callback: noop
-  });
+  defaults(opts, DEFAULT_OPTS);
 
   Object.assign(this, opts);
 
@@ -60,22 +56,17 @@ OpenTypeGeometry.prototype.updateLayout = function(opts) {
 OpenTypeGeometry.prototype.loadText = function(opts) {
   let _this = this;
   if(!opts.fontFace) throw new Error('must specify a fontface to load opentype geometry');
-  defaults(opts, {
-    fontSizePx: 72,
-    lineHeight: 2,
-    width: 600,
-    letterSpacing: 1.175,
-    currentText: undefined,
-    extrude: {
-      amount: 1000,
-      steps: 1000,
-      bevelEnabled    : true,
-      bevelThickness  : 100,
-      bevelSize       : 100,
-      bevelSegments   : 4
-    },
-    callback: noop
-  });
+  defaults(opts, defaults(DEFAULT_OPTS, { 
+        extrude: {
+          amount: 4,
+          steps: 2,
+          bevelEnabled    : true,
+          bevelThickness  : 100,
+          bevelSize       : 5,
+          bevelSegments   : 5
+        }
+      })
+  );
 
   Object.assign(this, opts);
 
