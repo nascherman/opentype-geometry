@@ -38,8 +38,10 @@ let bevelEnabled = options.bevelEnabled !== undefined ? options.bevelEnabled : t
   svgPaths.forEach((path, i) => {
     if(path.length === 0) return;
     let shapePath = transformSVGPath(path, THREE);
-    shapes.push( shapePath);
-    shapeGeo.push(new THREE.ShapeGeometry(shapes[i-1] ) );    
+    if(!(shapePath.actions.length === 1 && shapePath.actions.args === undefined)) {
+      shapes.push( shapePath);
+      shapeGeo.push(new THREE.ShapeGeometry(shapes[i-1] ) );      
+    }
   });
 
   shapeGeo.forEach((geo) => {

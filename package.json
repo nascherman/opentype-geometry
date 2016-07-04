@@ -29,6 +29,7 @@
     "lodash.defaults": "^4.0.1",
     "opentype": "^0.1.2",
     "opentype-layout": "^1.1.0",
+    "orbit-controls": "^1.0.4",
     "parse-svg-path": "^0.1.1",
     "three": "^0.78.0",
     "three-orbit-controls": "^72.0.0"
@@ -61,6 +62,7 @@
     "parse-svg-path": "^0.1.1",
     "parse-unit": "^1.0.1",
     "semistandard": "^8.0.0",
-    "uglify-js": "^2.6.3"
+    "uglify-js": "^2.6.3",
+    "xhr": "^2.2.0"
   }
 }

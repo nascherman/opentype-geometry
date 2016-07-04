@@ -18,6 +18,7 @@ OpenTypeGeometry.prototype.setText = function(text) {
     let scale = 1 / this.font.unitsPerEm * this.fontSizePx;
     let result = computeLayout(this.font, text, {
       lineHeight: this.lineHeight * this.font.unitsPerEm,
+      letterSpacing: this.letterSpacing * this.font.unitsPerEm,
       width: this.width / scale
     });
 
@@ -31,6 +32,31 @@ OpenTypeGeometry.prototype.setText = function(text) {
     });
 }
 
+OpenTypeGeometry.prototype.updateLayout = function(opts) {
+  let _this = this;
+  defaults(opts, {
+    fontSizePx: 72,
+    lineHeight: 2,
+    width: 600,
+    letterSpacing: 1.175,
+    extrude: {
+      amount: 1000,
+      steps: 1000,
+      bevelEnabled    : true,
+      bevelThickness  : 100,
+      bevelSize       : 100,
+      bevelSegments   : 4
+    },
+    callback: noop
+  });
+
+  Object.assign(this, opts);
+
+  opentype.load(this.fontFace, function(err, font) {
+    _this.font = font;
+  });
+}
+
 OpenTypeGeometry.prototype.loadText = function(opts) {
   let _this = this;
   if(!opts.fontFace) throw new Error('must specify a fontface to load opentype geometry');
@@ -38,7 +64,8 @@ OpenTypeGeometry.prototype.loadText = function(opts) {
     fontSizePx: 72,
     lineHeight: 2,
     width: 600,
-    text: 'No text',
+    letterSpacing: 1.175,
+    currentText: undefined,
     extrude: {
       amount: 1000,
       steps: 1000,
@@ -57,7 +84,17 @@ OpenTypeGeometry.prototype.loadText = function(opts) {
     _this.chars = [];
     Object.keys(font.glyphs.glyphs).forEach(function(glyphKey) {
       let glyph = font.glyphs.glyphs[glyphKey];
-      if(glyph.unicode !== undefined && typeof String.fromCharCode(glyph.unicode) === 'string') {
+      if(opts.loadFonts) {
+        if(glyph.unicode !== undefined && typeof String.fromCharCode(glyph.unicode) === 'string'
+          && opts.loadFonts.indexOf(String.fromCharCode(glyph.unicode)) !== -1) {
+          _this.chars.push({
+            code: glyph.unicode,
+            geometry: pathToShape(glyph.path, opts, THREE)
+          });  
+        }
+      }
+      //load all text
+      else if(glyph.unicode !== undefined && typeof String.fromCharCode(glyph.unicode) === 'string') {
         _this.chars.push({
           code: glyph.unicode,
           geometry: pathToShape(glyph.path, opts, THREE)
@@ -66,6 +103,7 @@ OpenTypeGeometry.prototype.loadText = function(opts) {
     });
 
     _this.font = font;
+    _this.fontFace = opts.fontFace;
     opts.callback();
   });
 }

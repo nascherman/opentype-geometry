@@ -1,16 +1,34 @@
-const opentype = require('opentype.js');
-const computeLayout = require('opentype-layout');
-const pathToShape = require('./util/pathToShape');
 const THREE = require('three');
-
-const OrbitControls = require('three-orbit-controls')(THREE);
+const OpenTypeGeometry = require('./');
 
 let renderer = new THREE.WebGLRenderer();
 let scene = new THREE.Scene();
+let container = new THREE.Object3D();
 let camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 100000 );
-// let ambientLight = new THREE.AmbientLight(0x0c0c0c);
+let ambientLight = new THREE.AmbientLight(0xffffff);
 let light = new THREE.PointLight( 0xffffff );
 let spotLight = new THREE.SpotLight( 0xffffff );
+let OrbitControls = require('three-orbit-controls')(THREE);
+
+let typeLayout = new OpenTypeGeometry();
+loadFonts = [
+  'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
+  'w','x','y','z',' '
+];
+loadFonts = loadFonts.concat(loadFonts.map((char) => { return char.toUpperCase() }))
+.concat(['!','@','#','$','%','^','&','*','(',')','_','-','=','+','{','[','}','\'','\"',
+  ';',':','/','?','\\','>','.',',','<','`','~','|']);  
+
+let guiOpts = {
+  text: 'Type some text here!',
+  remoteFont: '',
+  lineHeight: 1.2,
+  width: 600,
+  letterSpacing: 0,
+  load: () => {
+     loadRemoteFont(guiOpts.remoteFont)
+  }
+}
 
 require('domready')(function() {
   createScene(render);
@@ -22,67 +40,101 @@ function createScene(callback) {
   let canvas = document.getElementById('canvas');
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  var controls = new OrbitControls( camera,  canvas );
   canvas.appendChild(renderer.domElement);
+
+  let gui = new dat.GUI( {
+    height: 5 * 32
+  })
+
+  gui.add(guiOpts, 'text').onChange(function() {
+    clearText();
+    typeLayout.setText(guiOpts.text);
+    layoutText();
+  });
+  gui.add(guiOpts, 'remoteFont').name('Remote .ttf/.otf/.woff url (cdn)'); 
+  gui.add(guiOpts, 'load').name('Click to load');
+  gui.add(guiOpts, 'lineHeight', 0.5, 4).onChange(() =>  {
+    changeLayout();
+  });
+  gui.add(guiOpts, 'width', 100, 2000).onChange(() => {
+    changeLayout();
+  });
+  gui.add(guiOpts, 'letterSpacing', 0, 2).onChange(() => {
+    changeLayout();
+  });
 
   renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.shadowMapEnabled = true;
-
-  opentype.load('./demo/fonts/Pacifico.ttf', (err, font) => {
-    if (err) throw err;
+  renderer.shadowMap.enabled = true;
+  light.intensity = 1;
+  spotLight.intensity = 1;
+  spotLight.position.x = 200;
+  camera.add(light);
+  camera.position.set(0,0,15000);
+  camera.rotation.y = Math.PI;
+  container.position.x = -8000;
+  container.position.y = 5000;
+  camera.add( spotLight );
+  scene.add(camera);
+  controls = new OrbitControls(camera, canvas)
   
-    let fontSizePx = 72;
-    let text = 'Hello World! This box should start word-wrapping!\n' +
-      'Symbols !@#$%^&*()__+{}'
-    let scale = 1 / font.unitsPerEm * fontSizePx;
-    // Layout some text - notice everything is in em units!
-    let result = computeLayout(font, text, {
-      lineHeight: 2 * font.unitsPerEm, // '2.5em' in font units
-      width: 600 / scale // '500px' in font units
-    });
-    let glyphGeometry = result.glyphs.map((glyph) => {
-      return {
-        position: glyph.position,
-        row: glyph.row,
-        index: glyph.index,
-        geometry: pathToShape(glyph.data.path, {
-          extrude: {
-              amount: 1000,
-              steps: 1000,
-              bevelEnabled    : true,
-              bevelThickness  : 1000,
-              bevelSize       : 1000,
-              bevelSegments   : 4,
-          }
-        }, THREE)
-      };
-    });
-    console.log(glyphGeometry);
-    let xOffset = 0;
+  scene.add(container);
+  typeLoad();
+  stats();
+  callback();
 
-    light.intensity = 0.5;
-    spotLight.intensity = 0.7;
-    spotLight.position.x = 200;
-    camera.add( light );
-    camera.position.z = 10000;
-    camera.position.x += 1000;
-    camera.add( spotLight );
-    scene.add(camera);
-
-    glyphGeometry.forEach((glyph) => {
-      let mesh = new THREE.Mesh(
-        glyph.geometry, 
-        new THREE.MeshPhongMaterial( { color: 0x000000, wireframe: false }) 
-      );
-      mesh.position.x = glyph.position[0];
-      mesh.position.y = glyph.position[1];
-      
-      scene.add(mesh);
+  function changeLayout() {
+    clearText();
+    typeLayout.updateLayout({
+      width: guiOpts.width,
+      letterSpacing: guiOpts.letterSpacing,
+      lineHeight: guiOpts.lineHeight
     });
+    typeLayout.setText(guiOpts.text);
+    layoutText();
+  }
+}
 
-    if(callback) callback();
+function clearText() {
+  typeLayout.currentText.forEach((glyph) => {
+    container.remove(glyph.mesh);
   });
+}
+
+function typeLoad(fontFace)  {
+  typeLayout.loadText({
+    fontFace: fontFace || './demo/fonts/Pacifico.ttf',
+    fontSizePx: 72,
+    lineHeight: guiOpts.lineHeight,
+    width: guiOpts.width,
+    letterSpacing: guiOpts.letterSpacing,
+    loadFonts: loadFonts,
+    callback: function() {
+      typeLayout.setText(guiOpts.text);
+      layoutText();
+    }
+  });
+}
+
+function layoutText() {
+  typeLayout.currentText.forEach((glyph) => {
+    let mesh = new THREE.Mesh(
+      glyph.geometry.geometry, 
+      new THREE.MeshPhongMaterial( { color: 0x000000, wireframe: false }) 
+    );
+    mesh.position.x = glyph.position[0];
+    mesh.position.y = glyph.position[1];
+    glyph.mesh = mesh;
+    container.add(mesh);
+  });
+}
+
+function render() {
+  requestAnimationFrame(render);
+  renderer.render(scene, camera);
+}
+
+function stats() {
   javascript:(function() {
     var script=document.createElement('script');
     script.onload= function(){
@@ -96,10 +148,12 @@ function createScene(callback) {
     script.src='//rawgit.com/mrdoob/stats.js/master/build/stats.min.js';
     document.head.appendChild(script);
   })();
-
 }
 
-function render() {
-  requestAnimationFrame(render);
-  renderer.render(scene, camera);
+function loadRemoteFont(url) {
+  if(url.length <= 0) return;
+  typeLayout.currentText.forEach((glyph) => {
+    container.remove(glyph.mesh);
+  });
+  typeLoad(url);
 }
