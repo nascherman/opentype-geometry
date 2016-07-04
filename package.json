@@ -6,7 +6,7 @@
   "scripts": {
     "test": "semistandard && node test.js",
     "start": "budo demo.js:bundle.js --live -- -t babelify",
-    "build": "browserify index.js -t babelify | uglifyjs -m -c warnings=false > bundle.js"
+    "build": "browserify demo.js -t babelify  > bundle.js"
   },
   "repository": {
     "type": "git",
