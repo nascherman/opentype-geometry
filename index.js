@@ -6,7 +6,7 @@ const xtend = require('xtend');
 const THREE = require('three');
 
 DEFAULT_OPTS = {
-  fontSizePx: 72,
+  fontSizePx: 8,
   lineHeight: 1,
   width: 600,
   letterSpacing: 0,
@@ -19,8 +19,8 @@ function noop() {}
 
 function OpenTypeGeometry(opts) {
   opts = opts || {};
-  if(opts.fontFace) 
-    this.loadText(opts);
+  if(opts.fontFace && opts.loadAll) 
+    this.loadAllTextGeometry(opts);
 }
 
 OpenTypeGeometry.prototype.setText = function(text) {
@@ -32,14 +32,25 @@ OpenTypeGeometry.prototype.setText = function(text) {
       width: this.width / scale
     });
 
+    
     this.currentText = result.glyphs.map(function(glyph) {
+      let exists = checkIfGeometryExists.call(_this, glyph.data.unicode); 
+      if(!exists) {
+        _this.lazyLoadGeometry(String.fromCharCode(glyph.data.unicode));
+      }
+
       return {
         position: glyph.position,
         row: glyph.row,
         index: glyph.index,
         geometry:_this.chars[_this.chars.findIndex(x => x.code === glyph.data.unicode)]
-      };
+      };  
     });
+
+    function checkIfGeometryExists(unicode) {
+      if(!this.chars) return false;
+      else return this.chars[_this.chars.findIndex(x => x.code === unicode)];
+    }
 }
 
 OpenTypeGeometry.prototype.updateLayout = function(opts) {
@@ -53,49 +64,57 @@ OpenTypeGeometry.prototype.updateLayout = function(opts) {
   });
 }
 
-OpenTypeGeometry.prototype.loadText = function(opts) {
+OpenTypeGeometry.prototype.lazyLoadGeometry = function(char, opts) {
+  opts = opts || {};
+  if(!char) throw new Error('Must specify a character to load');
+  let _this = this;
+  if(!this.chars) this.chars = [];
+  //let glyph = this.font.glyphs.glyphs.findIndex(x => String.fromCharCode(x.unicode) === opts.char);
+  let glyph;
+  Object.keys(this.font.glyphs.glyphs).forEach(function(key) {
+    if(String.fromCharCode(_this.font.glyphs.glyphs[key].unicode) === char)
+      glyph = _this.font.glyphs.glyphs[key]; 
+  });
+  if(glyph && glyph.unicode !== undefined && typeof String.fromCharCode(glyph.unicode) === 'string') {
+    _this.chars.push({
+      code: glyph.unicode,
+      geometry: pathToShape(glyph.path, opts, THREE)
+    });  
+  }
+}
+
+OpenTypeGeometry.prototype.loadAllTextGeometry = function(opts) {
   let _this = this;
   if(!opts.fontFace) throw new Error('must specify a fontface to load opentype geometry');
-  defaults(opts, defaults(DEFAULT_OPTS, { 
-        extrude: {
-          amount: 4,
-          steps: 2,
-          bevelEnabled    : true,
-          bevelThickness  : 100,
-          bevelSize       : 5,
-          bevelSegments   : 5
-        }
-      })
-  );
+  defaults(opts, DEFAULT_OPTS);
 
   Object.assign(this, opts);
+    
+  this.chars = [];
+  Object.keys(_this.font.glyphs.glyphs).forEach(function(glyphKey) {
+    let glyph = font.glyphs.glyphs[glyphKey];
+    if(glyph.unicode !== undefined && typeof String.fromCharCode(glyph.unicode) === 'string'
+      && opts.loadFonts.indexOf(String.fromCharCode(glyph.unicode)) !== -1) {
+      _this.chars.push({
+        code: glyph.unicode,
+        geometry: pathToShape(glyph.path, opts, THREE)
+      });  
+    }
+  });
+  opts.callback();
+}
 
-  opentype.load(opts.fontFace, function(err, font) {
-    if (err) throw err;
-    _this.chars = [];
-    Object.keys(font.glyphs.glyphs).forEach(function(glyphKey) {
-      let glyph = font.glyphs.glyphs[glyphKey];
-      if(opts.loadFonts) {
-        if(glyph.unicode !== undefined && typeof String.fromCharCode(glyph.unicode) === 'string'
-          && opts.loadFonts.indexOf(String.fromCharCode(glyph.unicode)) !== -1) {
-          _this.chars.push({
-            code: glyph.unicode,
-            geometry: pathToShape(glyph.path, opts, THREE)
-          });  
-        }
-      }
-      //load all text
-      else if(glyph.unicode !== undefined && typeof String.fromCharCode(glyph.unicode) === 'string') {
-        _this.chars.push({
-          code: glyph.unicode,
-          geometry: pathToShape(glyph.path, opts, THREE)
-        });
-      }
-    });
-
+OpenTypeGeometry.prototype.loadOpenType = function(opts) {
+  let _this = this;
+  if(!opts.fontFace) throw new Error('opts fontface is not defined');
+  // clean old font
+  this.chars = undefined;
+  defaults(opts, DEFAULT_OPTS);
+  Object.assign(this, opts);
+  opentype.load(this.fontFace, function(err, font) {
     _this.font = font;
     _this.fontFace = opts.fontFace;
-    opts.callback();
+    _this.callback();
   });
 }
 

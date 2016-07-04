@@ -2,13 +2,15 @@ const assign = require('object-assign');
 const toSvg = require('./glyphToSvgPath');
 const transformSVGPath = require('./transformSvgPath');
 const defaults = require('lodash.defaults');
+const simplify = require('simplify-path');
+var parse = require('parse-svg-path')
+var contours = require('svg-path-contours')
 
 function svgPathsToShape (path, opts, THREE) {
   opts = assign({
     delaunay: true,
     clean: true,
     exterior: false,
-    simplify: 0,
     scale: 1
   }, opts);
 
@@ -32,6 +34,7 @@ function svgPathsToShape (path, opts, THREE) {
   let mergedGeo = [];
 
   svgPaths.forEach((path, i) => {
+    let simp = simplify(contours(parse(path)), 10);
     if(path.length === 0) return;
     let shapePath = transformSVGPath(path, THREE);
     if(!(shapePath.actions.length === 1 && shapePath.actions.args === undefined)) {

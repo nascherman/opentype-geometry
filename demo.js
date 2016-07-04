@@ -102,7 +102,7 @@ function clearText() {
 }
 
 function typeLoad(fontFace)  {
-  typeLayout.loadText({
+  typeLayout.loadOpenType({
     fontFace: fontFace || './demo/fonts/Pacifico.ttf',
     fontSizePx: 72,
     lineHeight: guiOpts.lineHeight,
