@@ -23,8 +23,10 @@ let guiOpts = {
   text: 'Type some text here!',
   remoteFont: '',
   lineHeight: 1.2,
-  width: 600,
+  width: 150,
   letterSpacing: 0,
+  extrude: false,
+  extrudeSettings: {},
   load: () => {
      loadRemoteFont(guiOpts.remoteFont)
   }
@@ -56,11 +58,29 @@ function createScene(callback) {
   gui.add(guiOpts, 'lineHeight', 0.5, 4).onChange(() =>  {
     changeLayout();
   });
-  gui.add(guiOpts, 'width', 100, 2000).onChange(() => {
+  gui.add(guiOpts, 'width', 10, 150).onChange(() => {
     changeLayout();
   });
   gui.add(guiOpts, 'letterSpacing', 0, 2).onChange(() => {
     changeLayout();
+  });
+  gui.add(guiOpts, 'extrude').onChange(() => {
+    typeLayout.resetGeometry(() => {
+      if(guiOpts.extrude) {
+        guiOpts.extrudeSettings = {
+          amount: 100,
+          steps: 5,
+          bevelEnabled: true,
+          bevelThickness: 15,
+          bevelSize: 10,
+          bevelSegments: 3
+        }
+      }
+      else {
+        guiOpts.extrudeSettings = {}
+      }
+      changeLayout();
+    });
   });
 
   renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
@@ -88,9 +108,12 @@ function createScene(callback) {
     typeLayout.updateLayout({
       width: guiOpts.width,
       letterSpacing: guiOpts.letterSpacing,
-      lineHeight: guiOpts.lineHeight
+      lineHeight: guiOpts.lineHeight,
+      extrude: guiOpts.extrude ? guiOpts.extrudeSettings : undefined 
     });
-    typeLayout.setText(guiOpts.text);
+    typeLayout.setText(guiOpts.text, {
+      extrude: guiOpts.extrudeSettings
+    });
     layoutText();
   }
 }
@@ -104,7 +127,7 @@ function clearText() {
 function typeLoad(fontFace)  {
   typeLayout.loadOpenType({
     fontFace: fontFace || './demo/fonts/Pacifico.ttf',
-    fontSizePx: 72,
+    fontSizePx: 16,
     lineHeight: guiOpts.lineHeight,
     width: guiOpts.width,
     letterSpacing: guiOpts.letterSpacing,

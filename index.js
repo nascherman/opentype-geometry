@@ -8,7 +8,7 @@ const THREE = require('three');
 DEFAULT_OPTS = {
   fontSizePx: 8,
   lineHeight: 1,
-  width: 600,
+  width: 100,
   letterSpacing: 0,
   currentText: undefined,
   extrude: undefined,
@@ -23,7 +23,7 @@ function OpenTypeGeometry(opts) {
     this.loadAllTextGeometry(opts);
 }
 
-OpenTypeGeometry.prototype.setText = function(text) {
+OpenTypeGeometry.prototype.setText = function(text, opts) {
   let _this = this;
     let scale = 1 / this.font.unitsPerEm * this.fontSizePx;
     let result = computeLayout(this.font, text, {
@@ -32,11 +32,10 @@ OpenTypeGeometry.prototype.setText = function(text) {
       width: this.width / scale
     });
 
-    
     this.currentText = result.glyphs.map(function(glyph) {
       let exists = checkIfGeometryExists.call(_this, glyph.data.unicode); 
       if(!exists) {
-        _this.lazyLoadGeometry(String.fromCharCode(glyph.data.unicode));
+        _this.lazyLoadGeometry(String.fromCharCode(glyph.data.unicode), opts);
       }
 
       return {
@@ -58,10 +57,7 @@ OpenTypeGeometry.prototype.updateLayout = function(opts) {
   defaults(opts, DEFAULT_OPTS);
 
   Object.assign(this, opts);
-
-  opentype.load(this.fontFace, function(err, font) {
-    _this.font = font;
-  });
+  this.setText(this.currentText, opts);
 }
 
 OpenTypeGeometry.prototype.lazyLoadGeometry = function(char, opts) {
@@ -69,7 +65,6 @@ OpenTypeGeometry.prototype.lazyLoadGeometry = function(char, opts) {
   if(!char) throw new Error('Must specify a character to load');
   let _this = this;
   if(!this.chars) this.chars = [];
-  //let glyph = this.font.glyphs.glyphs.findIndex(x => String.fromCharCode(x.unicode) === opts.char);
   let glyph;
   Object.keys(this.font.glyphs.glyphs).forEach(function(key) {
     if(String.fromCharCode(_this.font.glyphs.glyphs[key].unicode) === char)
@@ -102,6 +97,12 @@ OpenTypeGeometry.prototype.loadAllTextGeometry = function(opts) {
     }
   });
   opts.callback();
+}
+
+OpenTypeGeometry.prototype.resetGeometry = function(callback) {
+  callback = callback || noop;
+  this.chars = undefined;
+  callback();
 }
 
 OpenTypeGeometry.prototype.loadOpenType = function(opts) {

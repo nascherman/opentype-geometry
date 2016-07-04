@@ -14,15 +14,16 @@ function svgPathsToShape (path, opts, THREE) {
     scale: 1
   }, opts);
 
+  // a little extrusion by default
   let extrudeSettings = defaults(opts.extrude, {
-    amount          : 20,
-    steps           : 1,
-    material        : 1,
-    extrudeMaterial : 0,
-    bevelEnabled    : true,
-    bevelThickness  : 2,
-    bevelSize       : 4,
-    bevelSegments   : 1,
+    amount: 20,
+    steps: 1,
+    material: 1,
+    extrudeMaterial: 0,
+    bevelEnabled: true,
+    bevelThickness: 2,
+    bevelSize: 4,
+    bevelSegments: 1
   });
 
   let geo = new THREE.Geometry();
