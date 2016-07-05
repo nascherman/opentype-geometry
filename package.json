@@ -27,6 +27,7 @@
     "babel-eslint": "^6.1.0",
     "draw-svg-path": "^1.0.0",
     "lodash.defaults": "^4.0.1",
+    "nice-color-palettes": "^1.0.1",
     "opentype": "^0.1.2",
     "opentype-layout": "^1.1.0",
     "orbit-controls": "^1.0.4",

@@ -5,7 +5,7 @@ const defaults = require('lodash.defaults');
 const xtend = require('xtend');
 const THREE = require('three');
 
-DEFAULT_OPTS = {
+const DEFAULT_OPTS = {
   fontSizePx: 8,
   lineHeight: 1,
   width: 100,
@@ -13,12 +13,14 @@ DEFAULT_OPTS = {
   currentText: undefined,
   extrude: undefined,
   callback: noop
-}
+};
 
 function noop() {}
 
 function OpenTypeGeometry(opts) {
   opts = opts || {};
+
+  Object.assign(this, opts);
   if(opts.fontFace && opts.loadAll) 
     this.loadAllTextGeometry(opts);
 }
@@ -88,8 +90,7 @@ OpenTypeGeometry.prototype.loadAllTextGeometry = function(opts) {
   this.chars = [];
   Object.keys(_this.font.glyphs.glyphs).forEach(function(glyphKey) {
     let glyph = font.glyphs.glyphs[glyphKey];
-    if(glyph.unicode !== undefined && typeof String.fromCharCode(glyph.unicode) === 'string'
-      && opts.loadFonts.indexOf(String.fromCharCode(glyph.unicode)) !== -1) {
+    if(glyph.unicode !== undefined && typeof String.fromCharCode(glyph.unicode) === 'string') {
       _this.chars.push({
         code: glyph.unicode,
         geometry: pathToShape(glyph.path, opts, THREE)
@@ -109,14 +110,17 @@ OpenTypeGeometry.prototype.loadOpenType = function(opts) {
   let _this = this;
   if(!opts.fontFace) throw new Error('opts fontface is not defined');
   // clean old font
-  this.chars = undefined;
-  defaults(opts, DEFAULT_OPTS);
-  Object.assign(this, opts);
-  opentype.load(this.fontFace, function(err, font) {
-    _this.font = font;
-    _this.fontFace = opts.fontFace;
-    _this.callback();
-  });
+  else {
+    this.chars = undefined;
+    defaults(opts, DEFAULT_OPTS);
+    Object.assign(this, opts);
+    opentype.load(this.fontFace, function(err, font) {
+      _this.font = font;
+      _this.fontFace = opts.fontFace;
+      _this.callback();
+    });  
+  }
+  
 }
 
 module.exports = OpenTypeGeometry

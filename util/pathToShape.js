@@ -35,7 +35,6 @@ function svgPathsToShape (path, opts, THREE) {
   let mergedGeo = [];
 
   svgPaths.forEach((path, i) => {
-    let simp = simplify(contours(parse(path)), 10);
     if(path.length === 0) return;
     let shapePath = transformSVGPath(path, THREE);
     if(!(shapePath.actions.length === 1 && shapePath.actions.args === undefined)) {

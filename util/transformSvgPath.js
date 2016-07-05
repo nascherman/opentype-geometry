@@ -200,7 +200,7 @@ module.exports = function(pathStr, THREE) {
                 y = ny;
                 break;
             default:
-                throw new Error("weird path command: " + activeCmd);
+                console.warn("weird path command: " + activeCmd);
         }
         if (firstX === null) {
             firstX = x;
