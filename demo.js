@@ -53,7 +53,7 @@ let extrudeSettings = {
     bevelEnabled: true,
     bevelThickness: 2,
     bevelSize: 4,
-    bevelSegments: 1,   
+    bevelSegments: 1
 };
 
 let fonts = ['DejaVuSans.ttf', 'Lobster.ttf', 'Pacifico.ttf', 
@@ -77,7 +77,9 @@ function createScene(callback) {
 
   gui.add(guiOpts, 'text').onChange(function() {
     clearText();
-    typeLayout.setText(guiOpts.text);
+    typeLayout.setText(guiOpts.text, {
+      extrude: guiOpts.extrude ? extrudeSettings : undefined
+    });
     layoutText();
   });
   let fontOptions = gui.addFolder('Font options');
@@ -109,7 +111,8 @@ function createScene(callback) {
 
   let colorOptions = gui.addFolder('Color Options');
   Object.keys(Colors).forEach((key) => {
-    Colors[key].forEach((color) => {
+    Colors[key].forEach((color, i) => {
+      if(i % 25 !== 0) return;
       let colorSplit = color.split('#')[1];
 
       colorOptions.addColor(guiOpts, color).onChange(() => {
