@@ -3,8 +3,7 @@ const toSvg = require('./glyphToSvgPath');
 const transformSVGPath = require('./transformSvgPath');
 const defaults = require('lodash.defaults');
 const simplify = require('simplify-path');
-var parse = require('parse-svg-path')
-var contours = require('svg-path-contours')
+var parse = require('parse-svg-path');
 
 function svgPathsToShape (path, opts, THREE) {
   // a little extrusion by default

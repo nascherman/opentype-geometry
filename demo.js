@@ -16,7 +16,7 @@ let OrbitControls = require('three-orbit-controls')(THREE);
 let typeLayout = new OpenTypeGeometry({
   currentText: 'Type some text here!'
 });
-let textColor = new THREE.Color(0x000000);
+let textColor = new THREE.Color(0xff0000);
 let currentFont = './demo/fonts/Pacifico.ttf';
 
 let guiOpts = {
@@ -24,8 +24,8 @@ let guiOpts = {
   remoteFont: '',
   lineHeight: 1.2,
   width: 150,
+  color: '#ff0000',
   letterSpacing: 0,
-  extrude: false,
   load: () => {
     if(typeLayout.currentText) loadRemoteFont('./demo/fonts/' + currentFont)
   },
@@ -39,12 +39,6 @@ let guiOpts = {
     layoutText();
   }
 };
-
-Object.keys(Colors).forEach((key) => {
-  Colors[key].forEach((color) => {
-    guiOpts[color.toString()] = color;
-  });
-});
 
 let extrudeSettings = {
     amount: 20,
@@ -106,20 +100,12 @@ function createScene(callback) {
   extrudeOptions.add(extrudeSettings, 'bevelEnabled');
   extrudeOptions.add(extrudeSettings, 'bevelThickness', 2, 20).step(1);
   extrudeOptions.add(extrudeSettings, 'bevelSize', 2, 10).step(1);
-  extrudeOptions.add(guiOpts, 'extrude');
   extrudeOptions.add(guiOpts, 'doExtrude').name('Extrude text');
 
-  let colorOptions = gui.addFolder('Color Options');
-  Object.keys(Colors).forEach((key) => {
-    Colors[key].forEach((color, i) => {
-      if(i % 25 !== 0) return;
-      let colorSplit = color.split('#')[1];
-
-      colorOptions.addColor(guiOpts, color).onChange(() => {
-        textColor = new THREE.Color(parseInt('0x' + colorSplit));
-        guiOpts.changeColor();
-      });
-    });
+  gui.addColor(guiOpts, 'color').onChange(() => {
+    let colorSplit = guiOpts.color.split('#')[1];
+    textColor = new THREE.Color(parseInt('0x' + colorSplit));
+    guiOpts.changeColor();  
   });
 
   renderer.setClearColor(0xFFFFFF, 1.0);
@@ -149,10 +135,10 @@ function changeLayout() {
     width: guiOpts.width,
     letterSpacing: guiOpts.letterSpacing,
     lineHeight: guiOpts.lineHeight,
-    extrude: guiOpts.extrude ? extrudeSettings : undefined 
+    extrude: extrudeSettings 
   });
   typeLayout.setText(guiOpts.text, {
-    extrude: guiOpts.extrude ? extrudeSettings : undefined 
+    extrude: extrudeSettings
   });
   layoutText();
 }
