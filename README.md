@@ -27,13 +27,11 @@ You can convert ttf files to threejs geometry to be made into a mesh like so.
 
 ## Install 
 
-Best used with npm and browserify. This should also work in Node.js and other environments.
-
 ```sh
 npm install opentype-geometry --save
 ```
 ## Demo 
 
-[Live Demo](http://nascherman.github.io/open-type-layout/)
+[Live Demo](https://opentype-geometry.herokuapp.com/)
 
 

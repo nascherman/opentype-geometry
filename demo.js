@@ -14,16 +14,16 @@ let spotLight = new THREE.SpotLight( 0xffffff );
 let OrbitControls = require('three-orbit-controls')(THREE);
 
 let typeLayout = new OpenTypeGeometry({
-  currentText: 'Type some text here!'
+  currentText: 'Enter Some text in dat.gui'
 });
 let textColor = new THREE.Color(0xff0000);
 let currentFont = './demo/fonts/Pacifico.ttf';
 
 let guiOpts = {
-  text: 'Type some text here!',
+  text: 'Enter Some text in dat.gui',
   remoteFont: '',
   lineHeight: 1.2,
-  width: 150,
+  width: 200,
   color: '#ff0000',
   letterSpacing: 0,
   load: () => {
@@ -116,7 +116,6 @@ function createScene(callback) {
   spotLight.position.x = 200;
   camera.add(light);
   camera.position.set(0,0,15000);
-  camera.rotation.y = Math.PI;
   container.position.x = -8000;
   container.position.y = 5000;
   camera.add( spotLight );

@@ -1,6 +1,6 @@
 {
   "name": "opentype-geometry",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "opentype to geometry",
   "main": "index.js",
   "scripts": {
@@ -32,11 +32,13 @@
     "draw-svg-path": "^1.0.0",
     "express": "^4.14.0",
     "lodash.defaults": "^4.0.1",
+    "object-assign": "^4.1.0",
     "opentype": "^0.1.2",
     "opentype-layout": "^1.1.0",
     "parse-svg-path": "^0.1.1",
     "simplify-path": "^1.1.0",
-    "three": "^0.78.0"
+    "three": "^0.78.0",
+    "xtend": "^4.0.1"
   },
   "devDependencies": {
     "babel-core": "^6.4.0",
