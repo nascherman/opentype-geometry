@@ -5,9 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "budo demo.js:bundle.js --dir static --live --debug -- -t babelify",
-    "build": "browserify demo.js -t babelify  > static/bundle.js",
-    "postinstall": "npm run build",
-    "heroku-start": "node server.js"
+    "build": "browserify demo.js -t babelify  > static/bundle.js"
   },
   "repository": {
     "type": "git",

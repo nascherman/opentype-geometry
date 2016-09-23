@@ -17,7 +17,7 @@ let typeLayout = new OpenTypeGeometry({
   currentText: 'Enter Some text in dat.gui'
 });
 let textColor = new THREE.Color(0xff0000);
-let currentFont = './demo/fonts/Pacifico.ttf';
+let currentFont = './assets/fonts/Pacifico.ttf';
 
 let guiOpts = {
   text: 'Enter Some text in dat.gui',
@@ -27,7 +27,7 @@ let guiOpts = {
   color: '#ff0000',
   letterSpacing: 0,
   load: () => {
-    if(typeLayout.currentText) loadRemoteFont('./demo/fonts/' + currentFont)
+    if(typeLayout.currentText) loadRemoteFont('./assets/fonts/' + currentFont)
   },
   doExtrude: () => {
     typeLayout.resetGeometry(() => {
