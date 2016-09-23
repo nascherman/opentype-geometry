@@ -44,7 +44,6 @@ let extrudeSettings = {
     amount: 20,
     steps: 1,
     material: 1,
-    bevelEnabled: true,
     bevelThickness: 2,
     bevelSize: 4,
     bevelSegments: 1
@@ -97,7 +96,6 @@ function createScene(callback) {
   let extrudeOptions = gui.addFolder('Extrude Options');
   extrudeOptions.add(extrudeSettings, 'amount', 20, 2000).step(1);
   extrudeOptions.add(extrudeSettings, 'steps', 1, 20).step(1);
-  extrudeOptions.add(extrudeSettings, 'bevelEnabled');
   extrudeOptions.add(extrudeSettings, 'bevelThickness', 2, 20).step(1);
   extrudeOptions.add(extrudeSettings, 'bevelSize', 2, 10).step(1);
   extrudeOptions.add(guiOpts, 'doExtrude').name('Extrude text');
@@ -150,7 +148,7 @@ function clearText() {
 
 function typeLoad(fontFace)  {
   typeLayout.loadOpenType({
-    fontFace: fontFace || './demo/fonts/Pacifico.ttf',
+    fontFace: fontFace || './assets/fonts/Pacifico.ttf',
     fontSizePx: 16,
     lineHeight: guiOpts.lineHeight,
     width: guiOpts.width,
