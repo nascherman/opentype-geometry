@@ -19,11 +19,17 @@ let typeLayout = new OpenTypeGeometry({
 let textColor = new THREE.Color(0xff0000);
 let currentFont = './assets/fonts/Pacifico.ttf';
 
+var copy = [
+  'Click + drag to rotate',
+  '',
+  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam sodales arcu felis, sed molestie ante faucibus a. Integer ligula est, cursus a nisl nec, tempus euismod lorem. Nullam risus felis, fringilla aliquam eros nec, condimentum pretium felis. Praesent rutrum ornare massa, ac rutrum nisl pharetra sit amet. Morbi scelerisque diam quis eleifend lacinia. Sed a porttitor leo. Aenean et vestibulum eros, id condimentum ligula. Quisque maximus, eros et bibendum tristique, enim nulla laoreet mi, molestie imperdiet felis dolor et turpis. Cras sed nunc nec tortor mollis auctor. Aenean cursus blandit metus, in viverra lacus fringilla nec. Nulla a consectetur urna. Sed scelerisque leo in arcu viverra, quis euismod leo maximus. Maecenas ultrices, ligula et malesuada volutpat, sapien nisi placerat ligula, quis dapibus eros diam vitae justo. Sed in elementum ante. Phasellus sed sollicitudin odio. Fusce iaculis tortor ut suscipit aliquam. Curabitur eu nunc id est commodo ornare eu nec arcu. Phasellus et placerat velit, ut tincidunt lorem. Sed at gravida urna. Vivamus id tristique lacus, nec laoreet dolor. Vivamus maximus quam nec consectetur aliquam. Integer condimentum nulla a elit porttitor molestie. Nullam nec dictum lacus. Curabitur rhoncus scelerisque magna ac semper. Curabitur porta est nec cursus tempus. Phasellus hendrerit ac dolor quis pellentesque. Aenean diam nisl, dapibus eget enim vitae, convallis tempor nibh. Proin sit amet ante suscipit, gravida odio ac, euismod neque. Sed sodales, leo eget congue ultricies, leo tellus euismod mauris, tempor finibus elit orci sit amet massa. Pellentesque aliquam magna a neque aliquet, ac dictum tortor dictum.',
+].join('\n');
+
 let guiOpts = {
-  text: 'Enter Some text in dat.gui',
+  text: copy,
   remoteFont: '',
   lineHeight: 1.2,
-  width: 200,
+  width: 300,
   color: '#ff0000',
   letterSpacing: 0,
   load: () => {
@@ -87,7 +93,7 @@ function createScene(callback) {
   gui.add(guiOpts, 'lineHeight', 0.5, 4).onChange(() =>  {
     changeLayout();
   });
-  gui.add(guiOpts, 'width', 10, 150).onChange(() => {
+  gui.add(guiOpts, 'width', 10, 400).onChange(() => {
     changeLayout();
   });
   gui.add(guiOpts, 'letterSpacing', 0, 2).onChange(() => {
@@ -113,8 +119,8 @@ function createScene(callback) {
   spotLight.intensity = 0.4;
   spotLight.position.x = 200;
   camera.add(light);
-  camera.position.set(0,0,15000);
-  container.position.x = -8000;
+  camera.position.set(0,0,25000);
+  container.position.x = -20000;
   container.position.y = 5000;
   camera.add( spotLight );
   scene.add(camera);
